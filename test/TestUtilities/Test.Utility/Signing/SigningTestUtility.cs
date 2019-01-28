@@ -318,7 +318,10 @@ namespace Test.Utility.Signing
             }
             else
             {
-                using (var temp = request.Create(issuer, certGen.NotBefore, certGen.NotAfter, certGen.SerialNumber.ToByteArray()))
+                // BigInteger ToByteArray returns a little endian byte array and CertificateRequest.Create expects a big endian array for serial number
+                var byteSerialNumber = certGen.SerialNumber.ToByteArray();
+                Array.Reverse(byteSerialNumber);
+                using (var temp = request.Create(issuer, certGen.NotBefore, certGen.NotAfter, byteSerialNumber))
                 {
                     certResult = temp.CopyWithPrivateKey(rsa);
                 }

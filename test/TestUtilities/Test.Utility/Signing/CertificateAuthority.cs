@@ -234,13 +234,15 @@ namespace Test.Utility.Signing
             }
 
             var bcCert = DotNetUtilities.FromX509Certificate(Certificate);
+            // Make sure the serial has the same lenght and format as the current cert serial
+            var serial = BigInteger.Parse(certificateId.SerialNumber.ToString()).ToString($"X{Certificate.SerialNumber.Length}");
 
             if (certificateId.MatchesIssuer(bcCert) &&
-                _issuedCertificates.ContainsKey(certificateId.SerialNumber.ToString()))
+                _issuedCertificates.ContainsKey(serial))
             {
                 RevocationInfo revocationInfo;
 
-                if (!_revokedCertificates.TryGetValue(certificateId.SerialNumber.ToString(), out revocationInfo))
+                if (!_revokedCertificates.TryGetValue(serial, out revocationInfo))
                 {
                     return CertificateStatus.Good;
                 }
@@ -345,7 +347,10 @@ namespace Test.Utility.Signing
                     certNotAfter = issuer.NotAfter;
                 }
 
-                using (var temp = request.Create(issuer, certNotBefore, certNotAfter, generator.SerialNumber.ToByteArray()))
+                // BigInteger ToByteArray returns a little endian byte array and CertificateRequest.Create expects a big endian array for serial number
+                var byteSerialNumber = generator.SerialNumber.ToByteArray();
+                Array.Reverse(byteSerialNumber);
+                using (var temp = request.Create(issuer, certNotBefore, certNotAfter, byteSerialNumber))
                 {
                     certResult = temp.CopyWithPrivateKey(certificateKey);
                 }
