@@ -1289,9 +1289,8 @@ namespace NuGet.Packaging.FuncTest
                     new List<KeyValuePair<string, HashAlgorithmName>>() { new KeyValuePair<string, HashAlgorithmName>(untrustedCertFingerprint, HashAlgorithmName.SHA256) });
 
                 var status = await provider.GetTrustResultAsync(packageReader, primarySignature, settings, CancellationToken.None);
-
                 Assert.Equal(SignatureVerificationStatus.Valid, status.Trust);
-                SigningTestUtility.AssertUntrustedRoot(status.Issues, Common.LogLevel.Warning);
+                SigningTestUtility.AssertNotUntrustedRoot(status.Issues, Common.LogLevel.Warning);
             }
         }
 #if IS_DESKTOP
@@ -1328,7 +1327,7 @@ namespace NuGet.Packaging.FuncTest
                 var status = await provider.GetTrustResultAsync(packageReader, primarySignature, settings, CancellationToken.None);
 
                 Assert.Equal(SignatureVerificationStatus.Valid, status.Trust);
-                SigningTestUtility.AssertUntrustedRoot(status.Issues, Common.LogLevel.Warning);
+                SigningTestUtility.AssertNotUntrustedRoot(status.Issues, Common.LogLevel.Warning);
             }
         }
 
@@ -1367,7 +1366,7 @@ namespace NuGet.Packaging.FuncTest
                 var status = await provider.GetTrustResultAsync(packageReader, primarySignature, settings, CancellationToken.None);
 
                 Assert.Equal(SignatureVerificationStatus.Valid, status.Trust);
-                SigningTestUtility.AssertUntrustedRoot(status.Issues, Common.LogLevel.Warning);
+                SigningTestUtility.AssertNotUntrustedRoot(status.Issues, Common.LogLevel.Warning);
             }
         }
 #endif
@@ -1404,7 +1403,7 @@ namespace NuGet.Packaging.FuncTest
                 var status = await provider.GetTrustResultAsync(packageReader, primarySignature, settings, CancellationToken.None);
 
                 Assert.Equal(SignatureVerificationStatus.Valid, status.Trust);
-                SigningTestUtility.AssertUntrustedRoot(status.Issues, Common.LogLevel.Warning);
+                SigningTestUtility.AssertNotUntrustedRoot(status.Issues, Common.LogLevel.Warning);
             }
         }
 #if IS_DESKTOP

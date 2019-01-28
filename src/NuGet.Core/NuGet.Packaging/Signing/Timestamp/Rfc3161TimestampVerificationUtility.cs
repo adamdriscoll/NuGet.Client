@@ -22,8 +22,8 @@ namespace NuGet.Packaging.Signing
             DateTimeOffset signerCertExpiry = DateTime.SpecifyKind(signerCertificate.NotAfter, DateTimeKind.Local);
             DateTimeOffset signerCertBegin = DateTime.SpecifyKind(signerCertificate.NotBefore, DateTimeKind.Local);
 
-            return timestamp.UpperLimit < signerCertExpiry &&
-                timestamp.LowerLimit > signerCertBegin;
+            return timestamp.UpperLimit <= signerCertExpiry &&
+                timestamp.LowerLimit >= signerCertBegin;
         }
 
         internal static bool TryReadTSTInfoFromSignedCms(

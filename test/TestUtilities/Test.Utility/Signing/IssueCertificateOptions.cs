@@ -33,7 +33,7 @@ namespace Test.Utility.Signing
             using (var keyPair = RSA.Create(keySizeInBits: 2048))
             {
                 var id = CertificateUtilities.GenerateRandomId();
-                var subjectName = new X500DistinguishedName($"C=US,ST=WA,L=Redmond,O=NuGet,CN=NuGet Test Root Certificate Authority ({id})");
+                var subjectName = new X500DistinguishedName($"C=US,S=WA,L=Redmond,O=NuGet,CN=NuGet Test Root Certificate Authority ({id})");
 
                 return new IssueCertificateOptions()
                 {
@@ -48,7 +48,7 @@ namespace Test.Utility.Signing
             using (var keyPair = RSA.Create(keySizeInBits: 2048))
             {
                 var id = CertificateUtilities.GenerateRandomId();
-                var subjectName = new X500DistinguishedName($"C=US,ST=WA,L=Redmond,O=NuGet,CN=NuGet Test Intermediate Certificate Authority ({id})");
+                var subjectName = new X500DistinguishedName($"C=US,S=WA,L=Redmond,O=NuGet,CN=NuGet Test Intermediate Certificate Authority ({id})");
 
                 return new IssueCertificateOptions()
                 {

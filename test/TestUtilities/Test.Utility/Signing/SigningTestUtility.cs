@@ -647,6 +647,29 @@ namespace Test.Utility.Signing
                 issue.Message.Contains("The revocation function was unable to check revocation for the certificate"));
         }
 
+        public static void AssertNotUntrustedRoot(IEnumerable<ILogMessage> issues, LogLevel logLevel)
+        {
+            string untrustedRoot;
+
+            if (RuntimeEnvironmentHelper.IsWindows)
+            {
+                untrustedRoot = "A certificate chain processed, but terminated in a root certificate which is not trusted by the trust provider";
+            }
+            else if (RuntimeEnvironmentHelper.IsMacOSX)
+            {
+                untrustedRoot = "The trust policy was not trusted.";
+            }
+            else
+            {
+                untrustedRoot = "self signed certificate";
+            }
+
+            Assert.DoesNotContain(issues, issue =>
+                issue.Code == NuGetLogCode.NU3018 &&
+                issue.Level == logLevel &&
+                issue.Message.Contains(untrustedRoot));
+        }
+
         public static void AssertUntrustedRoot(IEnumerable<ILogMessage> issues, LogLevel logLevel)
         {
             string untrustedRoot;

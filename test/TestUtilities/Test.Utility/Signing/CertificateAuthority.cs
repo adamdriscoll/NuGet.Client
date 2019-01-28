@@ -278,13 +278,6 @@ namespace Test.Utility.Signing
             Action<TestCertificateGenerator> customizeCertificate)
         {
             var serialNumber = _nextSerialNumber;
-            var notAfter = options.NotAfter.UtcDateTime;
-
-            // An issued certificate should not have a validity period beyond the issuer's validity period.
-            if (notAfter > Certificate.NotAfter)
-            {
-                notAfter = Certificate.NotAfter;
-            }
 
             var certificate = CreateCertificate(
                 options.KeyPair,
@@ -293,7 +286,7 @@ namespace Test.Utility.Signing
                 serialNumber,
                 options.SubjectName,
                 options.NotBefore.UtcDateTime,
-                notAfter,
+                options.NotAfter.UtcDateTime,
                 options.CustomizeCertificate ?? customizeCertificate,
                 Certificate);
 
@@ -338,7 +331,21 @@ namespace Test.Utility.Signing
             }
             else
             {
-                using (var temp = request.Create(issuer, generator.NotBefore, generator.NotAfter, generator.SerialNumber.ToByteArray()))
+                var certNotBefore = generator.NotBefore;
+                var certNotAfter = generator.NotAfter;
+
+                // An issued certificate should not have a validity period beyond the issuer's validity period.
+                if (certNotBefore < issuer.NotBefore)
+                {
+                    certNotBefore = issuer.NotBefore;
+                }
+
+                if (certNotAfter > issuer.NotAfter)
+                {
+                    certNotAfter = issuer.NotAfter;
+                }
+
+                using (var temp = request.Create(issuer, certNotBefore, certNotAfter, generator.SerialNumber.ToByteArray()))
                 {
                     certResult = temp.CopyWithPrivateKey(certificateKey);
                 }
