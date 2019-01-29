@@ -69,7 +69,7 @@ namespace NuGet.Packaging.FuncTest
                 Assert.Equal(test.Request.PackageOwners, repositoryCountersignature.PackageOwners);
             }
         }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
         [Fact]
         public async Task GetSignatureValue_WithSha256_ReturnsValue()
         {

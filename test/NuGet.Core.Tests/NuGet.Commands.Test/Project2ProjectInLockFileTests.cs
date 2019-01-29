@@ -151,7 +151,7 @@ namespace NuGet.Commands.Test
                 Assert.Equal("2.0.0", project2Target.Dependencies.Single().VersionRange.ToLegacyShortString());
             }
         }
-#if IS_DESKTOP 
+#if SUPPORTS_FULL_SIGNING
         [Fact]
         public async Task Project2ProjectInLockFile_PackageReferenceConflict()
         {

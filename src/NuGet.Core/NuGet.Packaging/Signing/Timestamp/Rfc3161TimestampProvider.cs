@@ -40,7 +40,7 @@ namespace NuGet.Packaging.Signing
             _timestamperUrl = timeStampServerUrl ?? throw new ArgumentNullException(nameof(timeStampServerUrl));
         }
 
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
         /// <summary>
         /// Timestamps data present in the TimestampRequest.
         /// </summary>
@@ -130,7 +130,7 @@ namespace NuGet.Packaging.Signing
             SignedCms timestampCms,
             IReadOnlyList<X509Certificate2> chain)
         {
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
             using (var timestampNativeCms = NativeCms.Decode(timestampCms.Encode()))
             {
                 timestampNativeCms.AddCertificates(

@@ -69,7 +69,7 @@ namespace NuGet.Packaging.FuncTest
                 }
             }
         }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
         [CIOnlyFact]
         public async Task VerifySignaturesAsync_ValidCertificateAndTimestamp_SuccessAsync()
         {
@@ -125,7 +125,7 @@ namespace NuGet.Packaging.FuncTest
             }
         }
 
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
         [CIOnlyFact]
         public async Task VerifySignaturesAsync_ValidCertificateAndTimestampWithDifferentHashAlgorithms_Timestamped_SuccessAsync()
         {
@@ -403,7 +403,7 @@ namespace NuGet.Packaging.FuncTest
                 }
             }
         }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
         [CIOnlyFact]
         public async Task VerifySignaturesAsync_SettingsNotRequireCheckCountersignature_WithValidPrimarySignatureAndInvalidCountersignature_Timestamped_SucceedsAsync()
         {
@@ -582,7 +582,7 @@ namespace NuGet.Packaging.FuncTest
                 }
             }
         }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
         [CIOnlyFact]
         public async Task VerifySignaturesAsync_SettingsRequireCheckCountersignature_WithValidPrimarySignatureAndValidCountersignature_Timestamped_SucceedsAsync()
         {
@@ -842,7 +842,7 @@ namespace NuGet.Packaging.FuncTest
                 }
             }
         }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
         [CIOnlyFact]
         public async Task GetTrustResultAsync_SettingsRequireExactlyOneTimestamp_MultipleTimestamps_FailsAsync()
         {
@@ -922,7 +922,7 @@ namespace NuGet.Packaging.FuncTest
                 }
             }
         }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
         [CIOnlyFact]
         public async Task GetTrustResultAsync_WithSignedTimestampedCountersignedAndCountersignatureTimestampedPackage_SucceedsAsync()
         {
@@ -1078,7 +1078,7 @@ namespace NuGet.Packaging.FuncTest
                 SigningTestUtility.AssertUntrustedRoot(status.Issues, Common.LogLevel.Error);
             }
         }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
         [CIOnlyFact]
         public async Task GetTrustResultAsync_RepositoryCountersignatureWithUntrustedRoot_EmptyAllowedUntrustedRootList_AllowUntrustedFalse_Timestamped_ErrorAsync()
         {
@@ -1220,7 +1220,7 @@ namespace NuGet.Packaging.FuncTest
             }
         }
 
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
         [CIOnlyFact]
         public async Task GetTrustResultAsync_RepositoryCountersignatureWithUntrustedRoot_NotInAllowedUntrustedRootList_AllowUntrustedFalse_Timestamped_ErrorAsync()
         {
@@ -1293,7 +1293,7 @@ namespace NuGet.Packaging.FuncTest
                 SigningTestUtility.AssertNotUntrustedRoot(status.Issues, Common.LogLevel.Warning);
             }
         }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
         [CIOnlyFact]
         public async Task GetTrustResultAsync_PrimarySignatureWithUntrustedRoot_InAllowedUntrustedRootList_AllowUntrustedFalse_Timestamped_SucceedsAsync()
         {
@@ -1406,7 +1406,7 @@ namespace NuGet.Packaging.FuncTest
                 SigningTestUtility.AssertNotUntrustedRoot(status.Issues, Common.LogLevel.Warning);
             }
         }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
         [CIOnlyFact]
         public async Task GetTrustResultAsync_WithUnavailableRevocationInformationInAcceptMode_DoesNotWarnAsync()
         {
@@ -1644,7 +1644,7 @@ namespace NuGet.Packaging.FuncTest
                     Assert.Equal(SignatureVerificationStatus.Unknown, result.Trust);
                 }
             }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
             [CIOnlyFact]
             public async Task GetTrustResultAsync_WithValidSignature_Timestamped_ReturnsValidAsync()
             {
@@ -1769,7 +1769,7 @@ namespace NuGet.Packaging.FuncTest
                 }
             }
 
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
             [CIOnlyTheory]
             [InlineData(true, SignatureVerificationStatus.Valid)]
             [InlineData(false, SignatureVerificationStatus.Disallowed)]
@@ -2017,7 +2017,7 @@ namespace NuGet.Packaging.FuncTest
                     Assert.Equal(SignatureVerificationStatus.Unknown, result.Trust);
                 }
             }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
             [CIOnlyFact]
             public async Task GetTrustResultAsync_WithValidTimestmapedSignature_ReturnsValidAsync()
             {
@@ -2144,7 +2144,7 @@ namespace NuGet.Packaging.FuncTest
                 }
             }
 
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
             [CIOnlyTheory]
             [InlineData(true, SignatureVerificationStatus.Valid)]
             [InlineData(false, SignatureVerificationStatus.Disallowed)]
@@ -2264,7 +2264,7 @@ namespace NuGet.Packaging.FuncTest
                     Assert.Equal(SignatureVerificationStatus.Suspect, status.Trust);
                 }
             }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
             [CIOnlyTheory]
             [InlineData(true, SignatureVerificationStatus.Valid)]
             [InlineData(false, SignatureVerificationStatus.Disallowed)]
@@ -2387,7 +2387,7 @@ namespace NuGet.Packaging.FuncTest
                     }
                 }
             }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
             [CIOnlyFact]
             public async Task GetTrustResultAsync_WithAlwaysVerifyCountersignatureBehavior_Timestamped_ReturnsDisallowedAsync()
             {
@@ -2546,7 +2546,7 @@ namespace NuGet.Packaging.FuncTest
                 }
             }
 
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
             [CIOnlyFact]
             public async Task GetTrustResultAsync_WithValidCountersignature_Timestamped_ReturnsValidAsync()
             {
@@ -2642,7 +2642,7 @@ namespace NuGet.Packaging.FuncTest
                     Assert.Equal(SignatureVerificationStatus.Valid, status.Trust);
                 }
             }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
             [CIOnlyTheory]
             [InlineData(true, SignatureVerificationStatus.Valid)]
             [InlineData(false, SignatureVerificationStatus.Disallowed)]
@@ -2750,7 +2750,7 @@ namespace NuGet.Packaging.FuncTest
                 }
             }
 
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
             [CIOnlyTheory]
             [InlineData(true)]
             [InlineData(false)]
@@ -2840,7 +2840,7 @@ namespace NuGet.Packaging.FuncTest
                     Assert.Equal(SignatureVerificationStatus.Suspect, status.Trust);
                 }
             }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
             [CIOnlyTheory]
             [InlineData(true, SignatureVerificationStatus.Valid)]
             [InlineData(false, SignatureVerificationStatus.Disallowed)]

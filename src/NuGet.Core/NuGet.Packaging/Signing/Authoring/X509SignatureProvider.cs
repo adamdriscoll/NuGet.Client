@@ -96,7 +96,7 @@ namespace NuGet.Packaging.Signing
         private static PrimarySignature CreatePrimarySignature(SignPackageRequest request, SignatureContent signatureContent, ILogger logger)
         {
             var cmsSigner = SigningUtility.CreateCmsSigner(request, logger);
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
             if (request.PrivateKey != null)
             {
                 return CreatePrimarySignature(cmsSigner, signatureContent.GetBytes(), request.PrivateKey);
@@ -108,7 +108,7 @@ namespace NuGet.Packaging.Signing
         private static PrimarySignature CreateRepositoryCountersignature(SignPackageRequest request, PrimarySignature primarySignature, ILogger logger)
         {
             var cmsSigner = SigningUtility.CreateCmsSigner(request, logger);
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
             if (request.PrivateKey != null)
             {
                 return CreateRepositoryCountersignature(cmsSigner, primarySignature, request.PrivateKey);
@@ -116,7 +116,7 @@ namespace NuGet.Packaging.Signing
 #endif
             return CreateRepositoryCountersignature(cmsSigner, request, primarySignature);
         }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
         private static PrimarySignature CreatePrimarySignature(CmsSigner cmsSigner, byte[] signingData, CngKey privateKey)
         {
             var cms = NativeUtility.NativeSign(cmsSigner, signingData, privateKey);
@@ -144,7 +144,7 @@ namespace NuGet.Packaging.Signing
 
             return PrimarySignature.Load(cms);
         }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
         private static PrimarySignature CreateRepositoryCountersignature(CmsSigner cmsSigner, PrimarySignature primarySignature, CngKey privateKey)
         {
             using (var primarySignatureNativeCms = NativeCms.Decode(primarySignature.GetBytes()))

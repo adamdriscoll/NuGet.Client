@@ -8,7 +8,6 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.Pkcs;
 using NuGet.Common;
 
-
 namespace NuGet.Packaging.Signing
 {
     internal class NativeCms : IDisposable
@@ -258,8 +257,7 @@ namespace NuGet.Packaging.Signing
                 }
             }
         }
-
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
         internal unsafe void AddCountersignature(CmsSigner cmsSigner, CngKey privateKey)
         {
             using (var hb = new HeapBlockRetainer())
@@ -276,7 +274,6 @@ namespace NuGet.Packaging.Signing
             }
         }
 #endif
-
         internal unsafe void AddTimestampToRepositoryCountersignature(SignedCms timestamp)
         {
             using (var hb = new HeapBlockRetainer())

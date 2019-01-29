@@ -102,7 +102,7 @@ namespace NuGet.Packaging.Signing
 
         public override byte[] GetSignatureValue()
         {
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
             return SignerInfo.GetSignature();
 #else
             throw new PlatformNotSupportedException();

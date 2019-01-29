@@ -29,7 +29,7 @@ namespace NuGet.Commands.FuncTest
 {
     public class RestoreCommandTests
     {
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
         [Theory]
         [InlineData("https://www.nuget.org/api/v2/", new Type[0])]
         [InlineData("https://api.nuget.org/v3/index.json", new[] { typeof(RemoteV3FindPackageByIdResourceProvider) })]
@@ -179,7 +179,7 @@ namespace NuGet.Commands.FuncTest
                 Assert.NotNull(libraryRange);
             }
         }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
         /// <summary>
         /// This test fixes https://github.com/NuGet/Home/issues/2901.
         /// </summary>
@@ -479,7 +479,7 @@ namespace NuGet.Commands.FuncTest
                 Assert.False(File.Exists(request.LockFilePath));
             }
         }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
         [Fact]
         public async Task RestoreCommand_FrameworkImportRulesAreAppliedAsync()
         {
@@ -1256,7 +1256,7 @@ namespace NuGet.Commands.FuncTest
                 Assert.Equal(0, unresolved.Count);
             }
         }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
         [Fact]
         public async Task RestoreCommand_InstallPackageWithReferenceDependenciesAsync()
         {
@@ -1625,7 +1625,7 @@ namespace NuGet.Commands.FuncTest
                 Assert.Equal(0, installed.Count);
             }
         }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
         [Fact]
         public async Task RestoreCommand_PopulatesProjectFileDependencyGroupsCorrectlyAsync()
         {

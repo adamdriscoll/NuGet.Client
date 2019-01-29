@@ -554,7 +554,6 @@ namespace Test.Utility.Signing
                 first.RepositoryCountersignatureVerificationBehavior == second.RepositoryCountersignatureVerificationBehavior;
         }
 
-#if IS_DESKTOP
         public static DisposableList<IDisposable> RegisterDefaultResponders(
             this ISigningTestServer testServer,
             TimestampService timestampService)
@@ -574,7 +573,6 @@ namespace Test.Utility.Signing
 
             return responders;
         }
-#endif
 
         public static async Task<VerifySignaturesResult> VerifySignatureAsync(SignedPackageArchive signPackage, SignedPackageVerifierSettings settings)
         {

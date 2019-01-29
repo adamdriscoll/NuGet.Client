@@ -69,7 +69,7 @@ namespace NuGet.Commands.FuncTest
                 Assert.Equal(json.ToString(), jsonOutput.ToString());
             }
         }
-#if IS_DESKTOP
+#if SUPPORTS_FULL_SIGNING
         [Fact]
         public async Task UWPRestore_VerifySatellitePackagesAreCompatibleInPCL()
         {
