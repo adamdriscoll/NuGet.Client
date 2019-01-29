@@ -282,7 +282,7 @@ namespace NuGet.Packaging.FuncTest
                 allowMultipleTimestamps: true,
                 allowNoTimestamp: true,
                 allowUnknownRevocation: false,
-                reportUnknownRevocation: true,
+                reportUnknownRevocation: false,
                 verificationTarget: VerificationTarget.All,
                 signaturePlacement: SignaturePlacement.Any,
                 repositoryCountersignatureVerificationBehavior: SignatureVerificationBehavior.IfExistsAndIsNecessary,

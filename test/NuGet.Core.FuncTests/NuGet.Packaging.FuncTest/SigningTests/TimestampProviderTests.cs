@@ -347,7 +347,7 @@ namespace NuGet.Packaging.FuncTest
                 });
         }
 
-        [CIOnlyFact]
+        [CIOnlyFact(Skip = "Dotnet API doesnt support creating certificates with SHA1")]
         public async Task GetTimestamp_WhenCertificateSignatureAlgorithmIsSha1_ThrowsAsync()
         {
             var testServer = await _testFixture.GetSigningTestServerAsync();

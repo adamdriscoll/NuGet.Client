@@ -33,14 +33,13 @@ namespace NuGet.Packaging.FuncTest
         public async Task Timestamp_Verify_WithOfflineRevocation_ReturnsCorrectFlagsAndLogsAsync()
         {
             var nupkg = new SimpleTestPackageContext();
+            var testServer = await _testFixture.GetSigningTestServerAsync();
 
-            using (var testServer = await SigningTestServer.CreateAsync())
             using (var responders = new DisposableList<IDisposable>())
             using (var packageStream = await nupkg.CreateAsStreamAsync())
             using (var testCertificate = new X509Certificate2(_trustedTestCert.Source.Cert))
-            using (var dir = TestDirectory.Create())
             {
-                var ca = CreateOfflineRevocationCA(testServer, responders, dir);
+                var ca = await _testFixture.GetOfflineTrustedCertificateAuthorityAsync();
                 var timestampService = TimestampService.Create(ca);
 
                 responders.Add(testServer.RegisterResponder(timestampService));
@@ -85,31 +84,7 @@ namespace NuGet.Packaging.FuncTest
             }
         }
 
-        private CertificateAuthority CreateOfflineRevocationCA(ISigningTestServer testServer, DisposableList<IDisposable> responders, TestDirectory dir)
-        {
-            var rootCa = CertificateAuthority.Create(testServer.Url);
-            var intermediateCa = rootCa.CreateIntermediateCertificateAuthority();
-
-            var rootCertificate = new X509Certificate2(rootCa.Certificate);
-
-            using (var trustedServerRoot = TrustedTestCert.Create(
-                rootCertificate,
-                StoreName.Root,
-                StoreLocation.LocalMachine,
-                dir))
-            {
-                var ca = intermediateCa;
-
-                while (ca != null)
-                {
-                    responders.Add(testServer.RegisterResponder(ca));
-
-                    ca = ca.Parent;
-                }
-
-                return intermediateCa;
-            }
-        }
+   
     }
 }
 

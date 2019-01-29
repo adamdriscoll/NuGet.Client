@@ -23,12 +23,14 @@ namespace NuGet.Packaging.FuncTest
         private TrustedTestCert<TestCertificate> _trustedTestCertExpired;
         private TrustedTestCert<TestCertificate> _trustedTestCertNotYetValid;
         private TrustedTestCert<X509Certificate2> _trustedServerRoot;
+        private TrustedTestCert<X509Certificate2> _offlineTrustedServerRoot;
         private TestCertificate _untrustedTestCert;
         private IReadOnlyList<TrustedTestCert<TestCertificate>> _trustedTestCertificateWithReissuedCertificate;
         private IList<ISignatureVerificationProvider> _trustProviders;
         private SigningSpecifications _signingSpecifications;
         private Lazy<Task<SigningTestServer>> _testServer;
         private Lazy<Task<CertificateAuthority>> _defaultTrustedCertificateAuthority;
+        private Lazy<Task<CertificateAuthority>> _offlineTrustedCertificateAuthority;
         private Lazy<Task<TimestampService>> _defaultTrustedTimestampService;
         private readonly DisposableList<IDisposable> _responders;
         private readonly TestDirectory _certDir;
@@ -37,6 +39,7 @@ namespace NuGet.Packaging.FuncTest
         {
             _testServer = new Lazy<Task<SigningTestServer>>(SigningTestServer.CreateAsync);
             _defaultTrustedCertificateAuthority = new Lazy<Task<CertificateAuthority>>(CreateDefaultTrustedCertificateAuthorityAsync);
+            _offlineTrustedCertificateAuthority = new Lazy<Task<CertificateAuthority>>(CreateOfflineRevocationCertificateAuthorityAsync);
             _defaultTrustedTimestampService = new Lazy<Task<TimestampService>>(CreateDefaultTrustedTimestampServiceAsync);
             _responders = new DisposableList<IDisposable>();
             _certDir = TestDirectory.Create();
@@ -184,6 +187,11 @@ namespace NuGet.Packaging.FuncTest
             return await _defaultTrustedCertificateAuthority.Value;
         }
 
+        public async Task<CertificateAuthority> GetOfflineTrustedCertificateAuthorityAsync()
+        {
+            return await _offlineTrustedCertificateAuthority.Value;
+        }
+
         public async Task<TimestampService> GetDefaultTrustedTimestampServiceAsync()
         {
             return await _defaultTrustedTimestampService.Value;
@@ -215,6 +223,32 @@ namespace NuGet.Packaging.FuncTest
             return intermediateCa;
         }
 
+        private async Task<CertificateAuthority> CreateOfflineRevocationCertificateAuthorityAsync()
+        {
+            var testServer = await _testServer.Value;
+            var rootCa = CertificateAuthority.Create(testServer.Url);
+            var intermediateCa = rootCa.CreateIntermediateCertificateAuthority();
+
+            var rootCertificate = new X509Certificate2(rootCa.Certificate);
+
+            _offlineTrustedServerRoot = TrustedTestCert.Create(
+                rootCertificate,
+                StoreName.Root,
+                StoreLocation.LocalMachine,
+                _certDir);
+
+                var ca = intermediateCa;
+
+            while (ca != null)
+            {
+                _responders.Add(testServer.RegisterResponder(ca));
+
+                ca = ca.Parent;
+            }
+
+            return intermediateCa;
+        }
+
         private async Task<TimestampService> CreateDefaultTrustedTimestampServiceAsync()
         {
             var testServer = await _testServer.Value;
@@ -233,6 +267,7 @@ namespace NuGet.Packaging.FuncTest
             _trustedTestCertExpired?.Dispose();
             _trustedTestCertNotYetValid?.Dispose();
             _trustedServerRoot?.Dispose();
+            _offlineTrustedServerRoot?.Dispose();
             _responders.Dispose();
             _certDir.Dispose();
 
