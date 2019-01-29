@@ -1805,7 +1805,8 @@ namespace NuGet.Packaging.FuncTest
                 }
             }
 
-            [CIOnlyTheory]
+            // OCSP are not supported on Linux
+            [CIOnlyPlatformTheory(Platform.Windows, Platform.Darwin)]
             [InlineData(true)]
             [InlineData(false)]
             public async Task GetTrustResultAsync_WithRevokedPrimaryCertificate_Timestamped_ReturnsSuspectAsync(bool allowEverything)
@@ -1849,7 +1850,8 @@ namespace NuGet.Packaging.FuncTest
                 }
             }
 
-            [CIOnlyTheory]
+            // OCSP are not supported on Linux
+            [CIOnlyPlatformTheory(Platform.Windows, Platform.Darwin)]
             [InlineData(true, SignatureVerificationStatus.Valid)]
             [InlineData(false, SignatureVerificationStatus.Disallowed)]
             public async Task GetTrustResultAsync_WithRevokedTimestampCertificate_ReturnsStatusAsync(
@@ -2180,7 +2182,8 @@ namespace NuGet.Packaging.FuncTest
                 }
             }
 
-            [CIOnlyTheory]
+            // OCSP are not supported on Linux
+            [CIOnlyPlatformTheory(Platform.Windows, Platform.Darwin)]
             [InlineData(true)]
             [InlineData(false)]
             public async Task GetTrustResultAsync_WithRevokedPrimaryCertificate_Timestamped_ReturnsSuspectAsync(bool allowEverything)
@@ -2224,7 +2227,8 @@ namespace NuGet.Packaging.FuncTest
                 }
             }
 #endif
-            [CIOnlyTheory]
+            // OCSP are not supported on Linux
+            [CIOnlyPlatformTheory(Platform.Windows, Platform.Darwin)]
             [InlineData(true)]
             [InlineData(false)]
             public async Task GetTrustResultAsync_WithRevokedPrimaryCertificate_ReturnsSuspectAsync(bool allowEverything)
@@ -2265,7 +2269,8 @@ namespace NuGet.Packaging.FuncTest
                 }
             }
 #if SUPPORTS_FULL_SIGNING
-            [CIOnlyTheory]
+            // OCSP are not supported on Linux
+            [CIOnlyPlatformTheory(Platform.Windows, Platform.Darwin)]
             [InlineData(true, SignatureVerificationStatus.Valid)]
             [InlineData(false, SignatureVerificationStatus.Disallowed)]
             public async Task GetTrustResultAsync_WithRevokedTimestampCertificate_ReturnsStatusAsync(
@@ -2751,7 +2756,8 @@ namespace NuGet.Packaging.FuncTest
             }
 
 #if SUPPORTS_FULL_SIGNING
-            [CIOnlyTheory]
+            // OCSP are not supported on Linux
+            [CIOnlyPlatformTheory(Platform.Windows, Platform.Darwin)]
             [InlineData(true)]
             [InlineData(false)]
             public async Task VerifyAsync_WithRevokedCountersignatureCertificate_Timestamped_ReturnsSuspectAsync(bool allowEverything)
@@ -2798,7 +2804,8 @@ namespace NuGet.Packaging.FuncTest
             }
 #endif
 
-            [CIOnlyTheory]
+            // OCSP are not supported on Linux
+            [CIOnlyPlatformTheory(Platform.Windows, Platform.Darwin)]
             [InlineData(true)]
             [InlineData(false)]
             public async Task VerifyAsync_WithRevokedCountersignatureCertificate_ReturnsSuspectAsync(bool allowEverything)
@@ -2841,7 +2848,8 @@ namespace NuGet.Packaging.FuncTest
                 }
             }
 #if SUPPORTS_FULL_SIGNING
-            [CIOnlyTheory]
+            // OCSP are not supported on Linux
+            [CIOnlyPlatformTheory(Platform.Windows, Platform.Darwin)]
             [InlineData(true, SignatureVerificationStatus.Valid)]
             [InlineData(false, SignatureVerificationStatus.Disallowed)]
             public async Task VerifyAsync_WithRevokedTimestampCertificate_ReturnsStatusAsync(
