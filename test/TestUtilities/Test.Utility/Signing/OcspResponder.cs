@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
+using System.Numerics;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Org.BouncyCastle.Asn1;
@@ -95,7 +96,8 @@ namespace Test.Utility.Signing
                 var thisUpdate = _options.ThisUpdate ?? now;
                 var nextUpdate = _options.NextUpdate ?? now.AddSeconds(1);
 
-                _responses.AddOrUpdate(certificateId.SerialNumber.ToString(), nextUpdate, (key, currentNextUpdate) =>
+                var serial = BigInteger.Parse(certificateId.SerialNumber.ToString()).ToString($"X{CertificateAuthority.Certificate.SerialNumber.Length}");
+                _responses.AddOrUpdate(serial, nextUpdate, (key, currentNextUpdate) =>
                 {
                     if (nextUpdate > currentNextUpdate)
                     {
