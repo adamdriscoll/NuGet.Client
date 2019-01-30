@@ -31,17 +31,17 @@ namespace NuGet.SolutionRestoreManager
         * ToolReferences *
         ******************/
 
-        internal static void ProcessToolReferences(ProjectNames projectNames, IVsProjectRestoreInfo projectRestoreInfo, DependencyGraphSpec dgSpec)
+        internal static void ProcessToolReferences(ProjectNames projectNames, IEnumerable TargetFrameworks, IVsReferenceItems ToolReferences, DependencyGraphSpec dgSpec)
         {
-            var toolFramework = GetToolFramework(projectRestoreInfo.TargetFrameworks);
-            var packagesPath = GetRestoreProjectPath(projectRestoreInfo.TargetFrameworks);
-            var fallbackFolders = GetRestoreFallbackFolders(projectRestoreInfo.TargetFrameworks).AsList();
-            var sources = GetRestoreSources(projectRestoreInfo.TargetFrameworks)
+            var toolFramework = GetToolFramework(TargetFrameworks);
+            var packagesPath = GetRestoreProjectPath(TargetFrameworks);
+            var fallbackFolders = GetRestoreFallbackFolders(TargetFrameworks).AsList();
+            var sources = GetRestoreSources(TargetFrameworks)
                 .Select(e => new PackageSource(e))
                 .ToList();
 
-            projectRestoreInfo
-                .ToolReferences
+            
+            ToolReferences
                 .Cast<IVsReferenceItem>()
                 .Select(r => ToolRestoreUtility.GetSpec(
                     projectNames.FullName,
