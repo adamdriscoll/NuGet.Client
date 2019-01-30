@@ -151,7 +151,7 @@ namespace NuGet.SolutionRestoreManager
             {
                 VSNominationUtilities.ProcessToolReferences(projectNames, projectRestoreInfo.TargetFrameworks, projectRestoreInfo.ToolReferences, dgSpec);
             }
-            else if (projectRestoreInfo2.ToolReferences != null)
+            else if (projectRestoreInfo2 != null && projectRestoreInfo2.ToolReferences != null)
             {
                 VSNominationUtilities.ProcessToolReferences(projectNames, projectRestoreInfo2.TargetFrameworks, projectRestoreInfo2.ToolReferences, dgSpec);
             }
