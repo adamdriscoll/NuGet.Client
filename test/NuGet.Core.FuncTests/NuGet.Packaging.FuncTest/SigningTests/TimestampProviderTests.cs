@@ -348,14 +348,14 @@ namespace NuGet.Packaging.FuncTest
                 });
         }
 
-        [CIOnlyFact(Skip = "Dotnet API doesnt support creating certificates with SHA1")]
+        [CIOnlyFact]
         public async Task GetTimestamp_WhenCertificateSignatureAlgorithmIsSha1_ThrowsAsync()
         {
             var testServer = await _testFixture.GetSigningTestServerAsync();
             var certificateAuthority = await _testFixture.GetDefaultTrustedCertificateAuthorityAsync();
             var timestampServiceOptions = new TimestampServiceOptions() { SignatureHashAlgorithm = new Oid(Oids.Sha1) };
-            var issueCertificateOptions = IssueCertificateOptions.CreateDefaultForTimestampService();
-            issueCertificateOptions.SignatureAlgorithmName = System.Security.Cryptography.HashAlgorithmName.SHA1;
+            var issueCertificateOptions = BCIssueCertificateOptions.CreateDefaultForTimestampService();
+            issueCertificateOptions.SignatureAlgorithmName = "SHA1WITHRSA";
 
             var timestampService = TimestampService.Create(certificateAuthority, timestampServiceOptions, issueCertificateOptions);
 

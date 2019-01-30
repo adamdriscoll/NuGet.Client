@@ -33,7 +33,7 @@ namespace Test.Utility.Signing
             using (var keyPair = RSA.Create(keySizeInBits: 2048))
             {
                 var id = CertificateUtilities.GenerateRandomId();
-                var subjectName = new X500DistinguishedName($"C=US,S=WA,L=Redmond,O=NuGet,CN=NuGet Test Root Certificate Authority ({id})");
+                var subjectName = new X500DistinguishedName($"C=US,L=Redmond,O=NuGet,CN=NuGet Test Root Certificate Authority ({id})");
 
                 return new IssueCertificateOptions()
                 {
@@ -48,7 +48,7 @@ namespace Test.Utility.Signing
             using (var keyPair = RSA.Create(keySizeInBits: 2048))
             {
                 var id = CertificateUtilities.GenerateRandomId();
-                var subjectName = new X500DistinguishedName($"C=US,S=WA,L=Redmond,O=NuGet,CN=NuGet Test Intermediate Certificate Authority ({id})");
+                var subjectName = new X500DistinguishedName($"C=US,L=Redmond,O=NuGet,CN=NuGet Test Intermediate Certificate Authority ({id})");
 
                 return new IssueCertificateOptions()
                 {
@@ -63,7 +63,7 @@ namespace Test.Utility.Signing
             using (var keyPair = RSA.Create(keySizeInBits: 2048))
             {
                 var id = CertificateUtilities.GenerateRandomId();
-                var subjectName = new X500DistinguishedName($"C=US,S=WA,L=Redmond,O=NuGet,CN=NuGet Test Certificate ({id})");
+                var subjectName = new X500DistinguishedName($"C=US,L=Redmond,O=NuGet,CN=NuGet Test Certificate ({id})");
 
                 return new IssueCertificateOptions()
                 {
@@ -78,7 +78,7 @@ namespace Test.Utility.Signing
             using (var keyPair = RSA.Create(keySizeInBits: 2048))
             {
                 var id = Guid.NewGuid().ToString();
-                var subjectName = new X500DistinguishedName($"C=US,S=WA,L=Redmond,O=NuGet,CN=NuGet Test Timestamp Service ({id})");
+                var subjectName = new X500DistinguishedName($"C=US,L=Redmond,O=NuGet,CN=NuGet Test Timestamp Service ({id})");
 
                 return new IssueCertificateOptions()
                 {

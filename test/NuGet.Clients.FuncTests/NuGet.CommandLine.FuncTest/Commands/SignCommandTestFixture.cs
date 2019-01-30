@@ -10,7 +10,6 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using NuGet.CommandLine.Test;
-using NuGet.Common;
 using NuGet.Packaging.Signing;
 using NuGet.Test.Utility;
 using Test.Utility.Signing;
@@ -322,7 +321,7 @@ namespace NuGet.CommandLine.FuncTest.Commands
                             }
                             else
                             {
-                                var crlName = urlSplits[1];
+                                var crlName = urlSplits[1].Replace("%20", " ");
                                 var crlPath = Path.Combine(TestDirectory, crlName);
                                 if (File.Exists(crlPath))
                                 {

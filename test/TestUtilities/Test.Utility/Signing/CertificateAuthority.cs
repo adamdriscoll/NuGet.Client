@@ -19,6 +19,9 @@ using GeneralName = Org.BouncyCastle.Asn1.X509.GeneralName;
 using HashAlgorithmName = System.Security.Cryptography.HashAlgorithmName;
 using System.Numerics;
 using System.Globalization;
+using Org.BouncyCastle.X509;
+using Org.BouncyCastle.Crypto.Operators;
+using Org.BouncyCastle.Crypto;
 
 namespace Test.Utility.Signing
 {
@@ -108,6 +111,43 @@ namespace Test.Utility.Signing
             }
 
             return IssueCertificate(options, customizeCertificate);
+        }
+
+        public X509Certificate2 IssueCertificateWithBC(BCIssueCertificateOptions options)
+        {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            void customizeCertificate(X509V3CertificateGenerator generator)
+            {
+                generator.AddExtension(
+                    X509Extensions.AuthorityInfoAccess,
+                    critical: false,
+                    extensionValue: new DerSequence(
+                        new AccessDescription(AccessDescription.IdADOcsp,
+                            new GeneralName(GeneralName.UniformResourceIdentifier, OcspResponderUri.OriginalString)),
+                        new AccessDescription(AccessDescription.IdADCAIssuers,
+                            new GeneralName(GeneralName.UniformResourceIdentifier, CertificateUri.OriginalString))));
+
+                var bcCert = DotNetUtilities.FromX509Certificate(Certificate);
+
+                generator.AddExtension(
+                    X509Extensions.AuthorityKeyIdentifier,
+                    critical: false,
+                    extensionValue: new AuthorityKeyIdentifierStructure(bcCert));
+                generator.AddExtension(
+                    X509Extensions.SubjectKeyIdentifier,
+                    critical: false,
+                    extensionValue: new SubjectKeyIdentifierStructure(options.KeyPair.Public));
+                generator.AddExtension(
+                    X509Extensions.BasicConstraints,
+                    critical: true,
+                    extensionValue: new BasicConstraints(cA: false));
+            }
+
+            return IssueCertificateWithBC(options, customizeCertificate);
         }
 
         public CertificateAuthority CreateIntermediateCertificateAuthority(IssueCertificateOptions options = null)
@@ -296,6 +336,69 @@ namespace Test.Utility.Signing
             _issuedCertificates.Add(certificate.SerialNumber, certificate);
 
             return certificate;
+        }
+
+        private X509Certificate2 IssueCertificateWithBC(
+            BCIssueCertificateOptions options,
+            Action<X509V3CertificateGenerator> customizeCertificate)
+        {
+            var serialNumber = _nextSerialNumber;
+            var serialBytes = serialNumber.ToByteArray();
+            Array.Reverse(serialBytes);
+            var bcSerial = new Org.BouncyCastle.Math.BigInteger(serialBytes);
+            var bcCert = DotNetUtilities.FromX509Certificate(Certificate);
+            var issuerName = PrincipalUtilities.GetSubjectX509Principal(bcCert);
+            var notAfter = options.NotAfter.UtcDateTime;
+
+            // An issued certificate should not have a validity period beyond the issuer's validity period.
+            if (notAfter > Certificate.NotAfter)
+            {
+                notAfter = Certificate.NotAfter;
+            }
+
+            var signatureFactory = new Asn1SignatureFactory(options.SignatureAlgorithmName, options.IssuerPrivateKey ?? DotNetUtilities.GetRsaKeyPair(KeyPair).Private);
+
+            var certificate = CreateCertificateWithBC(
+                options.KeyPair.Public,
+                signatureFactory,
+                bcSerial,
+                issuerName,
+                options.SubjectName,
+                options.NotBefore.UtcDateTime,
+                notAfter,
+                options.CustomizeCertificate ?? customizeCertificate);
+
+            _nextSerialNumber = BigInteger.Add(_nextSerialNumber, BigInteger.One);
+            _issuedCertificates.Add(certificate.SerialNumber, certificate);
+
+            return certificate;
+        }
+
+        private static X509Certificate2 CreateCertificateWithBC(
+              AsymmetricKeyParameter certificatePublicKey,
+              Asn1SignatureFactory signatureFactory,
+              Org.BouncyCastle.Math.BigInteger serialNumber,
+              X509Name issuerName,
+              X509Name subjectName,
+              DateTimeOffset notBefore,
+              DateTimeOffset notAfter,
+              Action<X509V3CertificateGenerator> customizeCertificate)
+        {
+            var generator = new X509V3CertificateGenerator();
+
+            generator.SetSerialNumber(serialNumber);
+            generator.SetIssuerDN(issuerName);
+            generator.SetNotBefore(notBefore.UtcDateTime);
+            generator.SetNotAfter(notAfter.UtcDateTime);
+            generator.SetSubjectDN(subjectName);
+            generator.SetPublicKey(certificatePublicKey);
+
+            customizeCertificate(generator);
+
+            var temp = generator.Generate(signatureFactory);
+
+            var certResult = new X509Certificate2(temp.GetEncoded());
+            return new X509Certificate2(certResult.Export(X509ContentType.Pkcs12), password: (string)null, keyStorageFlags: X509KeyStorageFlags.Exportable);
         }
 
         private static X509Certificate2 CreateCertificate(
