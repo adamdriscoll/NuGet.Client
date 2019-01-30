@@ -222,13 +222,13 @@ namespace NuGet.SolutionRestoreManager
 
             return packageSpec;
         }
-
+        // Right now all of these are the same. Figure out if you can combine them somehow.
         private static PackageSpec ToPackageSpec(ProjectNames projectNames, IVsProjectRestoreInfo2 projectRestoreInfo)
         {
             var tfis = projectRestoreInfo
                 .TargetFrameworks
                 .Cast<IVsTargetFrameworkInfo2>()
-                .Select(VSNominationUtilities.ToTargetFrameworkInformation) // TODO NK: Make sure this works.
+                .Select(VSNominationUtilities.ToTargetFrameworkInformation)
                 .ToArray();
 
             var projectFullPath = Path.GetFullPath(projectNames.FullName);
