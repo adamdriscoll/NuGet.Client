@@ -365,8 +365,8 @@ namespace NuGet.Packaging.Test
                 ZeroPackageSignatureFileLastModifiedDateTimes(
                     expectedPackage,
                     actualPackage,
-                    offsetOfLocalFileHeaderLastModifiedDateTime: 0x1df,
-                    offsetOfCentralDirectoryHeaderLastModifiedDateTime: 0x851);
+                    offsetOfLocalFileHeaderLastModifiedDateTime: 0x1d5,
+                    offsetOfCentralDirectoryHeaderLastModifiedDateTime: 0x91c);
 
                 Assert.Equal(expectedPackage, actualPackage);
             }
@@ -400,8 +400,8 @@ namespace NuGet.Packaging.Test
                 ZeroPackageSignatureFileLastModifiedDateTimes(
                     expectedPackage,
                     actualPackage,
-                    offsetOfLocalFileHeaderLastModifiedDateTime: 0x1df,
-                    offsetOfCentralDirectoryHeaderLastModifiedDateTime: 0xa7a);
+                    offsetOfLocalFileHeaderLastModifiedDateTime: 0x1d5,
+                    offsetOfCentralDirectoryHeaderLastModifiedDateTime: 0xb68);
 
                 Assert.Equal(expectedPackage, actualPackage);
             }
