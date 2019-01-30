@@ -117,14 +117,12 @@ namespace NuGet.SolutionRestoreManager
                         .Select(ToPackageLibraryDependency));
             }
             
-            // tODO NK
-            if(targetFrameworkInfo as IVsTargetFrameworkInfo2 tfi2)
+            if(targetFrameworkInfo is IVsTargetFrameworkInfo2 targetFrameworkInfo2)
             {
-                
-                if ((tfi2.PackageDownloads != null)
+                if (targetFrameworkInfo2.PackageDownloads != null)
                 {
                     tfi.DownloadDependencies.AddRange(
-                       tfi2.PackageDownloads
+                       targetFrameworkInfo2.PackageDownloads
                            .Cast<IVsReferenceItem>()
                            .Select(ToPackageDownloadDependency));
                 }
