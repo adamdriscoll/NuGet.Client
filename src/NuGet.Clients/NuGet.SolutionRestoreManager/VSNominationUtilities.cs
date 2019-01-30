@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using NuGet.Commands;
@@ -63,10 +64,9 @@ namespace NuGet.SolutionRestoreManager
          * IVSTargetFrameworks based APIs (1st iteration of the nominate API.) * 
          **********************************************************************/
 
-        internal static RuntimeGraph GetRuntimeGraph(IVsProjectRestoreInfo projectRestoreInfo)
+        internal static RuntimeGraph GetRuntimeGraph(IVsTargetFrameworks targetFrameworks)
         {
-            var runtimes = projectRestoreInfo
-                .TargetFrameworks
+            var runtimes = targetFrameworks
                 .Cast<IVsTargetFrameworkInfo>()
                 .SelectMany(tfi => new[]
                 {
@@ -78,8 +78,7 @@ namespace NuGet.SolutionRestoreManager
                 .Select(rid => new RuntimeDescription(rid))
                 .ToList();
 
-            var supports = projectRestoreInfo
-                .TargetFrameworks
+            var supports = targetFrameworks
                 .Cast<IVsTargetFrameworkInfo>()
                 .Select(tfi => GetPropertyValueOrNull(tfi.Properties, ProjectBuildProperties.RuntimeSupports))
                 .SelectMany(MSBuildStringUtility.Split)
@@ -117,6 +116,20 @@ namespace NuGet.SolutionRestoreManager
                         .Select(ToPackageLibraryDependency));
             }
 
+
+            // tODO NK
+            if(targetFrameworkInfo as IVsTargetFrameworkInfo2 tfi2)
+            {
+                
+                if ((tfi2.PackageDownloads != null)
+                {
+                    tfi.DownloadDependencies.AddRange(
+                       tfi2.PackageDownloads
+                           .Cast<IVsReferenceItem>()
+                           .Select(ToPackageDownloadDependency));
+                }
+            }
+
             return tfi;
         }
 
@@ -140,6 +153,13 @@ namespace NuGet.SolutionRestoreManager
 
             return tfi;
         }
+
+        internal static string GetPackageId(ProjectNames projectNames, IVsTargetFrameworks2 tfms)
+        {
+            var packageId = GetSingleNonEvaluatedPropertyOrNull(tfms, ProjectBuildProperties.PackageId, v => v);
+            return packageId ?? projectNames.ShortName;
+        }
+
         internal static string GetPackageId(ProjectNames projectNames, IVsTargetFrameworks tfms)
         {
             var packageId = GetSingleNonEvaluatedPropertyOrNull(tfms, ProjectBuildProperties.PackageId, v => v);
@@ -325,6 +345,20 @@ namespace NuGet.SolutionRestoreManager
                 privateAssets: GetPropertyValueOrNull(item, ProjectBuildProperties.PrivateAssets));
 
             return dependency;
+        }
+
+        private static DownloadDependency ToPackageDownloadDependency(IVsReferenceItem item)
+        {
+            var id = item.Name;
+            var versionRange = GetVersionRange(item);
+            if (!(versionRange.HasLowerAndUpperBounds && versionRange.MinVersion.Equals(versionRange.MaxVersion)))
+            {
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "Strings.Error_PackageDownload_OnlyExactVersionsAreAllowed TODO NK", versionRange.OriginalString));
+            }
+
+            var downloadDependency = new DownloadDependency(id, versionRange);
+
+            return downloadDependency;
         }
 
         private static ProjectRestoreReference ToProjectRestoreReference(IVsReferenceItem item, string projectDirectory)

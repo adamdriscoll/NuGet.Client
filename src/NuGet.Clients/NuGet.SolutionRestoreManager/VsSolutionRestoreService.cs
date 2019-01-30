@@ -111,9 +111,7 @@ namespace NuGet.SolutionRestoreManager
 
                 var projectNames = ProjectNames.FromFullProjectPath(projectUniqueName);
 
-                var dgSpec = projectRestoreInfo != null ?
-                    ToDependencyGraphSpec(projectNames, projectRestoreInfo) :
-                    null; // TODO NK - Implement the ToDependencyGraphSpec for IVSProjectRestoreInfo2. Should they be inheriting from one another
+                var dgSpec = ToDependencyGraphSpec(projectNames, projectRestoreInfo, projectRestoreInfo2);
 
                 _projectSystemCache.AddProjectRestoreInfo(projectNames, dgSpec);
 
@@ -137,11 +135,13 @@ namespace NuGet.SolutionRestoreManager
             }
         }
 
-        private static DependencyGraphSpec ToDependencyGraphSpec(ProjectNames projectNames, IVsProjectRestoreInfo projectRestoreInfo)
+        private static DependencyGraphSpec ToDependencyGraphSpec(ProjectNames projectNames, IVsProjectRestoreInfo projectRestoreInfo, IVsProjectRestoreInfo2 projectRestoreInfo2)
         {
             var dgSpec = new DependencyGraphSpec();
 
-            var packageSpec = ToPackageSpec(projectNames, projectRestoreInfo);
+            var packageSpec = projectRestoreInfo != null ?
+                ToPackageSpec(projectNames, projectRestoreInfo) :
+                ToPackageSpec(projectNames, projectRestoreInfo2);
             dgSpec.AddRestore(packageSpec.RestoreMetadata.ProjectUniqueName);
             dgSpec.AddProject(packageSpec);
 
@@ -216,7 +216,77 @@ namespace NuGet.SolutionRestoreManager
                     CacheFilePath = NoOpRestoreUtilities.GetProjectCacheFilePath(cacheRoot: outputPath, projectPath: projectFullPath),
                     RestoreLockProperties = VSNominationUtilities.GetRestoreLockProperties(projectRestoreInfo.TargetFrameworks)
                 },
-                RuntimeGraph = VSNominationUtilities.GetRuntimeGraph(projectRestoreInfo),
+                RuntimeGraph = VSNominationUtilities.GetRuntimeGraph(projectRestoreInfo.TargetFrameworks),
+                RestoreSettings = new ProjectRestoreSettings() { HideWarningsAndErrors = true }
+            };
+
+            return packageSpec;
+        }
+
+        private static PackageSpec ToPackageSpec(ProjectNames projectNames, IVsProjectRestoreInfo2 projectRestoreInfo)
+        {
+            var tfis = projectRestoreInfo
+                .TargetFrameworks
+                .Cast<IVsTargetFrameworkInfo2>()
+                .Select(VSNominationUtilities.ToTargetFrameworkInformation) // TODO NK: Make sure this works.
+                .ToArray();
+
+            var projectFullPath = Path.GetFullPath(projectNames.FullName);
+            var projectDirectory = Path.GetDirectoryName(projectFullPath);
+
+            // Initialize OTF and CT values when original value of OTF property is not provided.
+            var originalTargetFrameworks = tfis
+                .Select(tfi => tfi.FrameworkName.GetShortFolderName())
+                .ToArray();
+            var crossTargeting = originalTargetFrameworks.Length > 1;
+
+            // if "TargetFrameworks" property presents in the project file prefer the raw value.
+            if (!string.IsNullOrWhiteSpace(projectRestoreInfo.OriginalTargetFrameworks))
+            {
+                originalTargetFrameworks = MSBuildStringUtility.Split(
+                    projectRestoreInfo.OriginalTargetFrameworks);
+                // cross-targeting is always ON even in case of a single tfm in the list.
+                crossTargeting = true;
+            }
+
+            var outputPath = Path.GetFullPath(
+                                Path.Combine(
+                                    projectDirectory,
+                                    projectRestoreInfo.BaseIntermediatePath));
+
+            var projectName = VSNominationUtilities.GetPackageId(projectNames, projectRestoreInfo.TargetFrameworks);
+
+            var packageSpec = new PackageSpec(tfis)
+            {
+                Name = projectName,
+                Version = VSNominationUtilities.GetPackageVersion(projectRestoreInfo.TargetFrameworks),
+                FilePath = projectFullPath,
+                RestoreMetadata = new ProjectRestoreMetadata
+                {
+                    ProjectName = projectName,
+                    ProjectUniqueName = projectFullPath,
+                    ProjectPath = projectFullPath,
+                    OutputPath = outputPath,
+                    ProjectStyle = ProjectStyle.PackageReference,
+                    TargetFrameworks = projectRestoreInfo.TargetFrameworks
+                        .Cast<IVsTargetFrameworkInfo2>()
+                        .Select(item => VSNominationUtilities.ToProjectRestoreMetadataFrameworkInfo(item, projectDirectory)) // TODO NK
+                        .ToList(),
+                    OriginalTargetFrameworks = originalTargetFrameworks,
+                    CrossTargeting = crossTargeting,
+
+                    // Read project properties for settings. ISettings values will be applied later since
+                    // this value is put in the nomination cache and ISettings could change.
+                    PackagesPath = VSNominationUtilities.GetRestoreProjectPath(projectRestoreInfo.TargetFrameworks),
+                    FallbackFolders = VSNominationUtilities.GetRestoreFallbackFolders(projectRestoreInfo.TargetFrameworks).AsList(),
+                    Sources = VSNominationUtilities.GetRestoreSources(projectRestoreInfo.TargetFrameworks)
+                                    .Select(e => new PackageSource(e))
+                                    .ToList(),
+                    ProjectWideWarningProperties = VSNominationUtilities.GetProjectWideWarningProperties(projectRestoreInfo.TargetFrameworks),
+                    CacheFilePath = NoOpRestoreUtilities.GetProjectCacheFilePath(cacheRoot: outputPath, projectPath: projectFullPath),
+                    RestoreLockProperties = VSNominationUtilities.GetRestoreLockProperties(projectRestoreInfo.TargetFrameworks)
+                },
+                RuntimeGraph = VSNominationUtilities.GetRuntimeGraph(projectRestoreInfo.TargetFrameworks),
                 RestoreSettings = new ProjectRestoreSettings() { HideWarningsAndErrors = true }
             };
 
