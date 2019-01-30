@@ -180,7 +180,8 @@ namespace NuGet.CommandLine.FuncTest.Commands
             }
         }
 
-        [CIOnlyFact]
+        // OCSP are not supported on Linux
+        [CIOnlyPlatformFact(Platform.Windows, Platform.Darwin)]
         public async Task Install_TamperedAndRevokedCertificateSignaturePackage_FailsAsync()
         {
             // Arrange

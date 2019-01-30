@@ -259,7 +259,8 @@ namespace NuGet.Packaging.FuncTest
             }
         }
 
-        [CIOnlyFact]
+        // OCSP are not supported on Linux
+        [CIOnlyPlatformFact(Platform.Windows, Platform.Darwin)]
         public async Task GetTimestamp_WhenTimestampSigningCertificateRevoked_ThrowsAsync()
         {
             var testServer = await _testFixture.GetSigningTestServerAsync();
