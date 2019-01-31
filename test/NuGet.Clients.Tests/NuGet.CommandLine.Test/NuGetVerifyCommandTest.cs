@@ -57,7 +57,7 @@ namespace NuGet.CommandLine.Test
                 Assert.Contains("File does not exist", result.Item3);
             }
         }
-
+#if SUPPORTS_FULL_SIGNING
         [Fact]
         public void VerifyCommand_WithAuthorSignedPackage_FailsGracefully()
         {
@@ -82,7 +82,7 @@ namespace NuGet.CommandLine.Test
                     Assert.Contains("Successfully verified package 'TestPackage.AuthorSigned.1.0.0'", result.AllOutput);
             }
         }
-
+#endif
         private static byte[] GetResource(string name)
         {
             return ResourceTestUtility.GetResourceBytes(

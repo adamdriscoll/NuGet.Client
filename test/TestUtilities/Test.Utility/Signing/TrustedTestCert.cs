@@ -165,15 +165,15 @@ namespace Test.Utility.Signing
         {
             if (!_isDisposed)
             {
-                using (_store)
-                {
-                    _store.Remove(TrustedCert);
-                }
-
                 if (_systemTrustedCertPath != null && RuntimeEnvironmentHelper.IsMacOSX)
                 {
                     var untrustProcess = Process.Start(@"/usr/bin/sudo", $@"security -v remove-trusted-cert -d {_systemTrustedCertPath}");
                     untrustProcess.WaitForExit();
+                }
+
+                using (_store)
+                {
+                    _store.Remove(TrustedCert);
                 }
 
                 DisposeCrl();
