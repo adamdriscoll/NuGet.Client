@@ -25,6 +25,8 @@ namespace NuGet.StaFact
         public object[] TestMethodArguments => _testCase.TestMethodArguments;
         public Dictionary<string, List<string>> Traits => _testCase.Traits;
         public string UniqueID => _testCase.UniqueID;
+        public Exception InitializationException => _testCase.InitializationException;
+        public int Timeout => _testCase.Timeout;
 
         public ISourceInformation SourceInformation
         {
